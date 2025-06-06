@@ -19,7 +19,7 @@ It provides a simple and intuitive interface to control all volumes, save and lo
 - **Dual Layout Modes**: 
   - **Output-Based**: A traditional mixer view with one column per output channel (e.g., Main, Headphone), showing all input faders for that output.
   - **Input-Based**: A view organized by input source (e.g., Mic 1, DAW 1/2), showing the faders for each output that the source is routed to.
-- **Modern UI**: A clean, dark-themed UI with the Inter font for excellent readability.
+- **Modern UI**: A clean, dark-themed UI.
 - **Responsive Design**: The layout dynamically adjusts to the window size.
 - **Automatic Device Detection**: Works with both EVO 4 and EVO 8.
 
@@ -55,7 +55,7 @@ sudo dnf install pkg-config libusb1-devel glfw-devel glew-devel
     ```
 
 2.  **Initialize Submodules:**
-    This project uses submodules for Dear ImGui, GLFW, GLEW, nlohmann/json, and the Inter font.
+    This project uses submodules for Dear ImGui, GLFW, GLEW, and nlohmann/json.
     ```bash
     git submodule update --init --recursive
     ```
@@ -70,10 +70,35 @@ sudo dnf install pkg-config libusb1-devel glfw-devel glew-devel
 
 ## How to Run
 
-After building, you can run the application from the project root with:
+After building, you can run the application from the project root to open the graphical interface:
 ```bash
 ./evoctl
 ```
+
+### Command-Line Usage (Headless)
+
+You can also load your saved settings without opening the GUI. This is useful for automatically applying your preferred mixer configuration when you start your system.
+
+```bash
+./evoctl --load-settings
+```
+This command will find your saved `settings.json`, apply all the volumes to the device, and then exit.
+
+#### Autostart on Linux (GNOME, KDE, etc.)
+
+You can use this command to automatically configure your EVO interface every time you log in.
+
+1.  **Open your Startup Applications tool.**
+    - In GNOME, search for "Startup Applications".
+    - In KDE, look for "Autostart" in the System Settings.
+    - Other desktop environments have similar tools.
+
+2.  **Add a new startup program.**
+    - **Name**: `EVO Settings Loader`
+    - **Command**: `/path/to/your/evoctl/repo/evoctl --load-settings` (Make sure to use the **full path** to the executable).
+    - **Comment**: `Loads Audient EVO mixer settings.`
+
+Now, your preferred mixer settings will be applied automatically every time your desktop session starts.
 
 ### udev Rules (for non-root access)
 
@@ -103,4 +128,3 @@ To run `evoctl` without needing `sudo`, you must grant your user permission to a
 - **GLFW**: For window and input handling. ([glfw/glfw](https://github.com/glfw/glfw))
 - **GLEW**: The OpenGL Extension Wrangler Library. ([nigels-com/glew](https://github.com/nigels-com/glew))
 - **nlohmann/json**: For JSON preset serialization. ([nlohmann/json](https://github.com/nlohmann/json))
-- **Inter Font**: For the beautiful and readable UI font. ([rsms/inter](https://github.com/rsms/inter))

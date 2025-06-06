@@ -18,6 +18,7 @@
 #include <filesystem>
 #include <cstdio> // for fprintf
 #include <cstdlib> // for getenv
+#include <string.h>
 
 // application
 #include "settings.h"
@@ -185,6 +186,22 @@ static void glfw_error_callback(int error, const char* description)
 int main(int argc, char** argv)
 {
     evo_init();
+
+    if (argc > 1 && strcmp(argv[1], "--load-settings") == 0) {
+        float volumes[NUM_OUTPUTS][NUM_INPUTS];
+        load_settings(volumes);
+        for (int i = 0; i < NUM_OUTPUTS; i++) {
+            for (int j = 0; j < NUM_INPUTS; j++) {
+                uint16_t wValue = 0x100 + 4 * j + i;
+                evo_ctrl_volume(wValue, 0x3c00, volumes[i][j]);
+            }
+        }
+        evo_close();
+        libusb_exit(NULL);
+        printf("Settings loaded and applied.\\n");
+        return 0;
+    }
+
     // Setup window
     glfwSetErrorCallback(glfw_error_callback);
     if (!glfwInit())
