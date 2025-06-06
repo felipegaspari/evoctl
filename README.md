@@ -1,73 +1,81 @@
-# evoctl
+# evoctl - A graphical control panel for Audient EVO audio interfaces
 
-Linux equivalent of the Audient EVO Mixer for their EVO audio interfaces.
+This is a fork of the original [evoctl project by dsharlet](https://github.com/dsharlet/evoctl), modified to use modern C++, ImGui for a graphical interface, and a Makefile-based build system that works on Linux.
 
-The application allows the user to control the levels for low-latency monitoring of the hardware and software inputs.
+`evoctl` provides a simple GUI to control the input and output volumes of Audient EVO 4 and EVO 8 audio interfaces.
 
-The goal of the project is to be able to control all the parameters which are not available on the interface itself - not to make a complete clone of the Audient UI.
+![Screenshot of evoctl](./doc/screenshot.png)
 
-## Screenshot
+## Features
 
-![evoctl screenshot](https://raw.githubusercontent.com/soerenbnoergaard/evoctl/main/doc/screenshot1.png)
+- Graphical control of all input and output channel volumes.
+- Input-based and output-based layout modes.
+- Automatic device detection for EVO 4 and EVO 8.
+- Configuration is saved according to the XDG Base Directory Specification (`~/.config/evoctl/imgui.ini`).
 
-## Usage
+## Dependencies
 
-This program detaches the kenel driver and configures the audio interface. The recommended workflow is therefore:
+Before you build, you need to install the following system libraries:
 
-1. Make sure Jack is stopped
-2. Start `evoctl` 
-3. Configure the low-latency routing for your session
-4. Exit `evoctl`
-5. Start Jack
+- `build-essential` (for `g++`, `make`, etc.)
+- `pkg-config`
+- `libusb-1.0-0-dev`
+- `libglfw3-dev`
+- `libgl1-mesa-dev`
 
-At the moment, it is not possible to re-configure the low-latency routing while Jack is running.
 
-## System setup
+## How to Build
 
-To use the program without sudo, create the file `/etc/udev/rules.d/70-audient.evo.rules` with the following content:
-
-    SUBSYSTEM=="usb", ATTR{idVendor}=="2708", ATTR{idProduct}=="0006", MODE="0666"
-    SUBSYSTEM=="usb", ATTR{idVendor}=="2708", ATTR{idProduct}=="0007", MODE="0666"
-
-## Download
-
-No binary releases are available so the program must be built fron source - see below.
-
-## Build
-
-The following commands are used to build the project:
-
-    git clone http://github.com/soerenbnoergaard/evoctl
+1.  **Clone the repository:**
+    ```sh
+    git clone <your-repository-url>
     cd evoctl
-    git submodule init
-    git submodule update
+    ```
+
+2.  **Initialize the submodules:**
+    This project uses submodules for ImGui, GLEW, and nlohmann/json.
+    ```sh
+    git submodule update --init --recursive
+    ```
+
+3.  **Build the application:**
+    Simply run `make` from the project root.
+    ```sh
     make
+    ```
+    This will compile the project and create an executable named `evoctl` in the root directory.
 
-The output will be an executable, `evoctl` in the `src/` directory.
+## How to Run
 
-## References
+After building, you can run the application with:
+```sh
+./evoctl
+```
 
-Other people have also been looking into controlling Audient interfaces from Linux:
+### udev Rules (for non-root access)
 
-- [audient-evo-linux-tools](https://github.com/vijay-prema/audient-evo-linux-tools)
-- [mymixer](https://github.com/r00tman/mymixer)
+To run `evoctl` without `sudo`, you need to grant your user permission to access the Audient EVO device. You can do this by creating a `udev` rule.
 
-Both of these have been very helpful in the development of this tool - thanks a lot!
+1.  Create a file at `/etc/udev/rules.d/55-audient-evo.rules`:
+    ```sh
+    sudo nano /etc/udev/rules.d/55-audient-evo.rules
+    ```
 
-Libraries:
+2.  Add the following line to the file:
+    ```
+    SUBSYSTEM=="usb", ATTR{idVendor}=="2708", MODE="0666"
+    ```
 
-- [libusb](https://libusb.info/)
-- [FLTK](https://www.fltk.org/)
+3.  Reload the udev rules for the changes to take effect:
+    ```sh
+    sudo udevadm control --reload-rules && sudo udevadm trigger
+    ```
 
-## Project status
+## Credits & Acknowledgements
 
-Completed:
-- USB descriptor details obtained with lsusb (see `/doc/lsusb_vvv_audient_evo_8.txt`).
-- USB control messages sniffed with Wireshark and included in the file `/doc/usb_control_messages.ods` (also includes messages no implemented in the program).
-- Basic GUI implemented as a transfer matrix allowing the user to set the volume from any source to any destination.
-- USB control implemented and working.
-
-Limitations/still missing:
-- It is only possible to use this program before Jack is started, as the detaching and reattaching of kernel driver messes up Jack. Please let me know if you know a way around this!
-- No parameters are read back from the device, so the settings are reset at startup.
+- **Original Project**: This work is heavily based on the original [evoctl by dsharlet](https://github.com/dsharlet/evoctl). Thank you for the reverse-engineering work and the solid foundation.
+- **Dear ImGui**: For the graphical user interface. ([ocornut/imgui](https://github.com/ocornut/imgui))
+- **GLEW**: The OpenGL Extension Wrangler Library. ([nigels-com/glew](https://github.com/nigels-com/glew))
+- **GLFW**: For window and input handling. ([glfw/glfw](https://github.com/glfw/glfw))
+- **nlohmann/json**: For JSON support. ([nlohmann/json](https://github.com/nlohmann/json))
 

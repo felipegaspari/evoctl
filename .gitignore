@@ -1,3 +1,9 @@
+# Build artifacts
 evoctl
-*.o
+obj/
+
+# ImGui
+imgui.ini
+
+# VSCode
 .vscode/*.log

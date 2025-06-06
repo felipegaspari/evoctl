@@ -1,22 +1,39 @@
 TARGET = evoctl$(EXEEXT)
 SOURCES = main.cxx
 # SOURCES = main_debug.cxx
-SOURCES += transfer_matrix_table.cxx
-OBJECTS = $(SOURCES:.cxx=.o)
+SOURCES += settings_manager.cpp
+# SOURCES += transfer_matrix_table.cxx
+SOURCES += ../vendor/imgui/imgui.cpp
+SOURCES += ../vendor/imgui/imgui_demo.cpp
+SOURCES += ../vendor/imgui/imgui_draw.cpp
+SOURCES += ../vendor/imgui/imgui_tables.cpp
+SOURCES += ../vendor/imgui/imgui_widgets.cpp
+SOURCES += ../vendor/imgui/backends/imgui_impl_glfw.cpp
+SOURCES += ../vendor/imgui/backends/imgui_impl_opengl3.cpp
+
+OBJECTS = $(SOURCES:.cpp=.o)
+OBJECTS := $(OBJECTS:.cxx=.o)
+OBJECTS := $(OBJECTS:.c=.o)
 
 ifeq '$(OS)' "Windows_NT"
 EXEEXT = .exe
 endif
 
-LIBUSBFLAGS  = -I/usr/include/libusb-1.0 -lusb-1.0
-FLTKCONFIG   = ../fltk/fltk-config
-CXX          = $(shell $(FLTKCONFIG) --cxx)
-CXXFLAGS     = $(shell $(FLTKCONFIG) --cxxflags) -Wall -I. $(LIBUSBFLAGS)
-LINKFLTK     = $(shell $(FLTKCONFIG) --ldstaticflags) $(LIBUSBFLAGS)
-LINKFLTK_GL  = $(shell $(FLTKCONFIG) --use-gl --ldstaticflags)
-LINKFLTK_IMG = $(shell $(FLTKCONFIG) --use-images --ldstaticflags)
-LINKFLTK_ALL = $(shell $(FLTKCONFIG) --use-images --use-gl --ldstaticflags)
-.SUFFIXES: .cxx .h .fl .o $(EXEEXT)
+PKGCFGS      = libusb-1.0 glfw3
+CXX          = g++
+CC           = gcc
+CXXFLAGS     = -Wall -I. -DIMGUI_ENABLE_DOCKING -DGLEW_STATIC
+CXXFLAGS     += -I../vendor/imgui -I../vendor/imgui/backends -I../vendor/glew/include -I../vendor/json/include
+CXXFLAGS     += $(shell pkg-config --cflags $(PKGCFGS))
+CFLAGS = -Wall -I. -DIMGUI_ENABLE_DOCKING -DGLEW_STATIC
+CFLAGS += -I../vendor/imgui -I../vendor/imgui/backends -I../vendor/glew/include -I../vendor/json/include
+CFLAGS += $(shell pkg-config --cflags $(PKGCFGS))
+LINKFLAGS    = $(shell pkg-config --libs $(PKGCFGS)) -lGL -L../vendor/glew/lib -lGLEW -Wl,-rpath,../vendor/glew/lib
+
+# GLEW static library
+GLEW_LIB = ../vendor/glew/lib/libglew.a
+
+.SUFFIXES: .c .cxx .cpp .h .o $(EXEEXT)
 
 RM    = rm -f
 SHELL = /bin/sh
@@ -30,12 +47,25 @@ clean:
 	$(RM) core
 
 # HOW TO LINK
-$(TARGET): $(OBJECTS)
+$(TARGET): $(OBJECTS) $(GLEW_LIB)
 	@echo "*** Linking $@..."
-	$(CXX) $(OBJECTS) $(LINKFLTK) $(LINKFLTK_IMG) -o $@
+	$(CXX) $(OBJECTS) $(LINKFLAGS) -o ../$@
 
 # HOW TO COMPILE
 .cxx.o:
 	@echo "*** Compile $<..."
-	$(CXX) -I.. $(CXXFLAGS) -c $< -o $@
+	$(CXX) $(CXXFLAGS) -c $< -o $@
+
+.cpp.o:
+	@echo "*** Compile $<..."
+	$(CXX) $(CXXFLAGS) -c $< -o $@
+
+.c.o:
+	@echo "*** Compile $<..."
+	$(CC) $(CFLAGS) -c $< -o $@
+
+# Build GLEW static library if needed
+$(GLEW_LIB):
+	$(MAKE) -C ../vendor/glew/auto
+	$(MAKE) -C ../vendor/glew SYSTEM=linux
 
