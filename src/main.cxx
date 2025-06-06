@@ -22,6 +22,7 @@
 // application
 #include "settings.h"
 #include "settings_manager.h"
+#include "Roboto-Medium.h"
 
 const char *input_names[NUM_INPUTS] = {
     "Mic 1", "Mic 2", "Mic 3", "Mic 4",
@@ -147,9 +148,9 @@ void evo_init()
 void evo_close()
 {
     if (devh) {
-        libusb_reset_device(devh);
-        libusb_release_interface(devh, 0);
-        libusb_close(devh);
+    libusb_reset_device(devh);
+    libusb_release_interface(devh, 0);
+    libusb_close(devh);
         devh = NULL;
     }
 }
@@ -260,7 +261,7 @@ int main(int argc, char** argv)
     io.ConfigFlags |= ImGuiConfigFlags_ViewportsEnable;   // Enable Multi-Viewport / Platform Windows
 
     // Load font from file
-    io.Fonts->AddFontFromFileTTF("vendor/imgui/misc/fonts/Roboto-Medium.ttf", 16.0f);
+    io.Fonts->AddFontFromMemoryCompressedTTF(RobotoFont_compressed_data, RobotoFont_compressed_size, 16.0f);
 
     set_style();
     //ImGui::StyleColorsClassic();
