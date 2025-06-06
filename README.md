@@ -4,7 +4,7 @@ A fork of the original [evoctl project by soerenbnoergaard](https://github.com/s
 
 It provides a simple and intuitive interface to control all volumes, save and load presets, and switch between different mixer layouts.
 
-*Note: This application uses `libusb` to communicate directly with the hardware. This means it cannot run at the same time as a DAW or any other application that needs to access the EVO audio interface. You must run `evoctl-ng` **before** starting your DAW to configure your mix, and then close it.*
+*Note: This application uses `libusb` to communicate directly with the hardware. This means it cannot run at the same time as a DAW or any other application that needs to access the EVO audio interface. You must run `evoctl` **before** starting your DAW to configure your mix, and then close it.*
 
 ### Output-Based Layout
 ![Output-Based Layout](./doc/evoctl-ng-output-layout.png)
