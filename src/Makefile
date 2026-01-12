@@ -23,13 +23,13 @@ endif
 PKGCFGS      = libusb-1.0 glfw3
 CXX          = g++
 CC           = gcc
-CXXFLAGS     = -Wall -I. -DIMGUI_ENABLE_DOCKING -DGLEW_STATIC -DGLEW_NO_GLU -DGLEW_EGL
+CXXFLAGS     = -Wall -I. -DIMGUI_ENABLE_DOCKING -DGLEW_STATIC -DGLEW_NO_GLU
 CXXFLAGS     += -I../vendor/glew/include -I../vendor/imgui -I../vendor/imgui/backends -I../vendor/json/include
 CXXFLAGS     += $(shell pkg-config --cflags $(PKGCFGS))
-CFLAGS = -Wall -I. -DIMGUI_ENABLE_DOCKING -DGLEW_STATIC -DGLEW_NO_GLU -DGLEW_EGL
+CFLAGS = -Wall -I. -DIMGUI_ENABLE_DOCKING -DGLEW_STATIC -DGLEW_NO_GLU
 CFLAGS += -I../vendor/glew/include -I../vendor/imgui -I../vendor/imgui/backends -I../vendor/json/include
 CFLAGS += $(shell pkg-config --cflags $(PKGCFGS))
-LINKFLAGS    = -static-libstdc++ -static-libgcc $(shell pkg-config --static --libs $(PKGCFGS)) -lGL -lEGL
+LINKFLAGS    = -static-libstdc++ -static-libgcc $(shell pkg-config --static --libs $(PKGCFGS)) -lGL
 
 # GLEW static library
 # GLEW_LIB = ../vendor/glew/lib/libGLEW.a

@@ -239,7 +239,29 @@ int main(int argc, char** argv)
 
     // Initialize GLEW
     glewExperimental = GL_TRUE;
+    
+    // Force GLEW to ignore missing GLX context if we are on Wayland (EGL) but using standard GLEW
+    // This is a hack because standard GLEW tries to probe GLX even if we have an EGL context from GLFW
+    // When using static GLEW, we can't easily switch backends at runtime without recompiling.
+    // However, if we are in a pure Wayland environment, GLFW uses EGL.
+    // If we are in X11/XWayland, GLFW uses GLX/EGL depending on config.
+    
+    // Try to init normally first
     GLenum err = glewInit();
+    
+    // If that fails with "No GLX display", it might be because we have a valid context but not a GLX one.
+    // In that case, we can try to proceed anyway if we are sure we have a context.
+    if (err != GLEW_OK) {
+        if (err == GLEW_ERROR_NO_GLX_DISPLAY) {
+             fprintf(stderr, "GLEW Warning: No GLX display detected. This is expected on Wayland if using EGL.\n");
+             fprintf(stderr, "Attempting to proceed anyway as we have a valid GLFW context...\n");
+             // Clear the error and assume success if we have a window
+             if (window) {
+                 err = GLEW_OK;
+             }
+        }
+    }
+
     if (err != GLEW_OK) {
         fprintf(stderr, "Failed to initialize OpenGL loader! Error: %s\n", glewGetErrorString(err));
         return 1;
