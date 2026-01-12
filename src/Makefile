@@ -10,6 +10,7 @@ SOURCES += ../vendor/imgui/imgui_tables.cpp
 SOURCES += ../vendor/imgui/imgui_widgets.cpp
 SOURCES += ../vendor/imgui/backends/imgui_impl_glfw.cpp
 SOURCES += ../vendor/imgui/backends/imgui_impl_opengl3.cpp
+SOURCES += ../vendor/glew/src/glew.c
 
 OBJECTS = $(SOURCES:.cpp=.o)
 OBJECTS := $(OBJECTS:.cxx=.o)
@@ -22,16 +23,16 @@ endif
 PKGCFGS      = libusb-1.0 glfw3
 CXX          = g++
 CC           = gcc
-CXXFLAGS     = -Wall -I. -DIMGUI_ENABLE_DOCKING -DGLEW_STATIC
-CXXFLAGS     += -I../vendor/imgui -I../vendor/imgui/backends -I../vendor/glew/include -I../vendor/json/include
+CXXFLAGS     = -Wall -I. -DIMGUI_ENABLE_DOCKING -DGLEW_STATIC -DGLEW_NO_GLU -DGLEW_EGL
+CXXFLAGS     += -I../vendor/glew/include -I../vendor/imgui -I../vendor/imgui/backends -I../vendor/json/include
 CXXFLAGS     += $(shell pkg-config --cflags $(PKGCFGS))
-CFLAGS = -Wall -I. -DIMGUI_ENABLE_DOCKING -DGLEW_STATIC
-CFLAGS += -I../vendor/imgui -I../vendor/imgui/backends -I../vendor/glew/include -I../vendor/json/include
+CFLAGS = -Wall -I. -DIMGUI_ENABLE_DOCKING -DGLEW_STATIC -DGLEW_NO_GLU -DGLEW_EGL
+CFLAGS += -I../vendor/glew/include -I../vendor/imgui -I../vendor/imgui/backends -I../vendor/json/include
 CFLAGS += $(shell pkg-config --cflags $(PKGCFGS))
-LINKFLAGS    = $(shell pkg-config --libs $(PKGCFGS)) -lGL -L../vendor/glew/lib -lGLEW -Wl,-rpath,../vendor/glew/lib
+LINKFLAGS    = -static-libstdc++ -static-libgcc $(shell pkg-config --static --libs $(PKGCFGS)) -lGL -lEGL
 
 # GLEW static library
-GLEW_LIB = ../vendor/glew/lib/libglew.a
+# GLEW_LIB = ../vendor/glew/lib/libGLEW.a
 
 .SUFFIXES: .c .cxx .cpp .h .o $(EXEEXT)
 
@@ -47,7 +48,7 @@ clean:
 	$(RM) core
 
 # HOW TO LINK
-$(TARGET): $(OBJECTS) $(GLEW_LIB)
+$(TARGET): $(OBJECTS)
 	@echo "*** Linking $@..."
 	$(CXX) $(OBJECTS) $(LINKFLAGS) -o ../$@
 

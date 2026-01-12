@@ -238,8 +238,10 @@ int main(int argc, char** argv)
     glfwSwapInterval(1); // Enable vsync
 
     // Initialize GLEW
-    if (glewInit() != GLEW_OK) {
-        fprintf(stderr, "Failed to initialize OpenGL loader!\n");
+    glewExperimental = GL_TRUE;
+    GLenum err = glewInit();
+    if (err != GLEW_OK) {
+        fprintf(stderr, "Failed to initialize OpenGL loader! Error: %s\n", glewGetErrorString(err));
         return 1;
     }
 
